@@ -36,9 +36,10 @@ public final class NombreValidation implements Validation<String>{
 			if(true) {//validar formato solo letras
 				result.addMessage("El nombre del estado del tipo relacion institucion solo puede contener letras y espacios");
 		}
-		return result;
-	}
 		
 	}
+		return result;
+		
+	}}
 
 

@@ -17,19 +17,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.uco.publiuco.business.facade.EstadoTipoRelacionInstitucionFacade;
+import co.edu.uco.publiuco.business.facade.impl.EstadoTipoRelacionInstitucionFacadeImpl;
 import co.edu.uco.publiuco.api.controller.response.Response;
 import co.edu.uco.publiuco.api.validator.estadotiporelacioninstitucion.RegistrarEstadoTipoRelacionInstitucionValidation;
 import co.edu.uco.publiuco.crosscutting.exception.PubliucoException;
 import co.edu.uco.publiuco.dto.EstadoTipoRelacionInstitucionDTO;
 
+
 @RestController
 @RequestMapping("publiuco/api/v1/estadotiporelacioninstitucion")
 public final class EstadoTipoRelacionInstitucionController {
 	
+	
 	private EstadoTipoRelacionInstitucionFacade facade;
 	
 	public EstadoTipoRelacionInstitucionController() {
-		facade = new EstadoTipoRelacionInstitucionFacadImpl() 
+		facade = new EstadoTipoRelacionInstitucionFacadeImpl();
 	}
 
 	@GetMapping("/dummy")
@@ -64,6 +68,7 @@ public final class EstadoTipoRelacionInstitucionController {
 	
 	@PostMapping
 	public ResponseEntity<Response<EstadoTipoRelacionInstitucionDTO>> create(@RequestParam EstadoTipoRelacionInstitucionDTO dto) {
+		
 		var statusCode = HttpStatus.OK;
 		var response = new Response<EstadoTipoRelacionInstitucionDTO>();
 		
@@ -72,20 +77,29 @@ public final class EstadoTipoRelacionInstitucionController {
 			
 			if(result.getMessages().isEmpty()) {
 				facade.register(dto);
-				response.getMessages().add("El nuevo tipo estado relacion institucion se ha registrado");
+				response.getMessages().add("El nuevo tipo relacion institucion se ha registrado");
+				
 			}else {
 				statusCode = HttpStatus.BAD_REQUEST;
 				response.setMessages(result.getMessages());
+
 			}
-		}catch (final PubliucoException exception) {
+				
+		} catch (final PubliucoException exception) {
 			statusCode = HttpStatus.BAD_REQUEST;
-			response.getMessages().add("Se ha presentado un error inesperado. Por favor intentar de nuevo y si el problema persiste contacte al administrador de la apicación");
+			response.getMessages().add(exception.getUserMessage());
+			System.err.println(exception.getTechnicalMessage());
 			System.err.println(exception.getType());
 			exception.printStackTrace();
 		}catch (final Exception exception) {
 			statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+			response.getMessages().add("Se ha presentado un problema inesperado. por favor intentar de nuevo y si el problema persiste contacte al administrador de la aplicacion");
+			System.err.println(exception.getMessage());
+			exception.printStackTrace();
 		}
-		return new ResponseEntity<>(response, statusCode);
+		
+		
+		return new ResponseEntity<>(response, statusCode) ;
 	}
 	
 	@PutMapping("/{id}")

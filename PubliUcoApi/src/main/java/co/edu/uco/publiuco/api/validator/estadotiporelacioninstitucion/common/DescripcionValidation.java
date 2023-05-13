@@ -6,6 +6,7 @@ import co.edu.uco.publiuco.api.validator.Result;
 import co.edu.uco.publiuco.api.validator.Validation;
 import co.edu.uco.publiuco.crosscutting.utils.UtilText;
 
+
 public final class DescripcionValidation implements Validation<String>{
 
 	
