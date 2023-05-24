@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.qos.logback.classic.Logger;
 import co.edu.uco.publiuco.business.facade.EstadoTipoRelacionInstitucionFacade;
 import co.edu.uco.publiuco.business.facade.impl.EstadoTipoRelacionInstitucionFacadeImpl;
 import co.edu.uco.publiuco.api.controller.response.Response;
@@ -29,12 +31,11 @@ import co.edu.uco.publiuco.dto.EstadoTipoRelacionInstitucionDTO;
 @RequestMapping("publiuco/api/v1/estadotiporelacioninstitucion")
 public final class EstadoTipoRelacionInstitucionController {
 	
+	private org.slf4j.Logger log = LoggerFactory.getLogger(EstadoTipoRelacionInstitucionController.class);
+
 	
 	private EstadoTipoRelacionInstitucionFacade facade;
 	
-	public EstadoTipoRelacionInstitucionController() {
-		facade = new EstadoTipoRelacionInstitucionFacadeImpl();
-	}
 
 	@GetMapping("/dummy")
 	public EstadoTipoRelacionInstitucionDTO dummy() {
@@ -42,7 +43,7 @@ public final class EstadoTipoRelacionInstitucionController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<Response<EstadoTipoRelacionInstitucionDTO>> list(@RequestParam EstadoTipoRelacionInstitucionDTO dto) {
+	public ResponseEntity<Response<EstadoTipoRelacionInstitucionDTO>> list(@RequestBody EstadoTipoRelacionInstitucionDTO dto) {
 		
 		
 		List<EstadoTipoRelacionInstitucionDTO> lista = new ArrayList<>();
@@ -67,7 +68,7 @@ public final class EstadoTipoRelacionInstitucionController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Response<EstadoTipoRelacionInstitucionDTO>> create(@RequestParam EstadoTipoRelacionInstitucionDTO dto) {
+	public ResponseEntity<Response<EstadoTipoRelacionInstitucionDTO>> create(@RequestBody EstadoTipoRelacionInstitucionDTO dto) {
 		
 		var statusCode = HttpStatus.OK;
 		var response = new Response<EstadoTipoRelacionInstitucionDTO>();
@@ -88,14 +89,12 @@ public final class EstadoTipoRelacionInstitucionController {
 		} catch (final PubliucoException exception) {
 			statusCode = HttpStatus.BAD_REQUEST;
 			response.getMessages().add(exception.getUserMessage());
-			System.err.println(exception.getTechnicalMessage());
-			System.err.println(exception.getType());
-			exception.printStackTrace();
+			log.error(exception.getType().toString().concat("-").concat(exception.getTechnicalMessage()), exception);
+			
 		}catch (final Exception exception) {
 			statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 			response.getMessages().add("Se ha presentado un problema inesperado. por favor intentar de nuevo y si el problema persiste contacte al administrador de la aplicacion");
-			System.err.println(exception.getMessage());
-			exception.printStackTrace();
+			log.error("se ha presentado un problema inesperado. Por favor validar la consola de errores...", exception);
 		}
 		
 		
@@ -103,7 +102,7 @@ public final class EstadoTipoRelacionInstitucionController {
 	}
 	
 	@PutMapping("/{id}")
-	public EstadoTipoRelacionInstitucionDTO update(@PathVariable UUID id, @RequestParam EstadoTipoRelacionInstitucionDTO dto) {
+	public EstadoTipoRelacionInstitucionDTO update(@PathVariable UUID id, @RequestBody EstadoTipoRelacionInstitucionDTO dto) {
 		return dto.setIdentificador(id);
 	}
 	
